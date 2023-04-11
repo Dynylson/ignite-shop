@@ -1,3 +1,4 @@
+import { useCart } from "@/contexts/CartContext";
 import { stripe } from "@/lib/stripe";
 import {
   ImageContainer,
@@ -23,6 +24,12 @@ interface ProductProps {
 }
 
 export default function Product({ product }: ProductProps) {
+  const { products, addItemsToCart } = useCart();
+
+  const productAlreadyExists = products.find(
+    (productCart) => productCart.id === product.id
+  );
+
   const [isCreatingChechkoutSession, setIsCreatingChechkoutSession] =
     useState(false);
 
@@ -64,10 +71,12 @@ export default function Product({ product }: ProductProps) {
           <p>{product.description}</p>
 
           <button
-            disabled={isCreatingChechkoutSession}
-            onClick={handleBuyProduct}
+            disabled={!!productAlreadyExists}
+            onClick={() => addItemsToCart(product)}
           >
-            Comprar agora
+            {productAlreadyExists
+              ? "Produto já está no carrinho"
+              : "Adicionar produto ao carrinho"}
           </button>
         </ProductDetails>
       </ProductContainer>
